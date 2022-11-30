@@ -24,8 +24,12 @@ auto_generate_count = 10  # number of figures to generate in auto-generate/captu
 requires_triggers = True
 labjack_port = 'FIO' # Either FIO, EIO, or CIO
 trigger_codes = {
-    'imagery_start': 2,
+    'trial_start': 2,
+    'animation_start': 4,
+    'circle_on': 6,
+    'imagery_start': 8,
     'EMG_TMS': 17,
+    'trial_end:': 10,
 }
 
 #########################################

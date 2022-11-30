@@ -379,6 +379,7 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 		if self.response_type == "imagery" and not self.magstim.ready:
 			self.magstim.arm()
 		
+		self.trigger.send('trial_start')
 		start_delay = CountDown(P.origin_wait_time)
 		while start_delay.counting():
 			ui_request()
@@ -386,6 +387,7 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 			blit(self.tracker_dot, 5, self.origin_pos)
 			flip()
 
+		self.trigger.send('animation_start')
 		animate_start = self.evm.trial_time
 		self.figure.animate()
 		animate_time = self.evm.trial_time - animate_start
@@ -398,6 +400,7 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 		else:
 			self.control_trial()
 
+		self.trigger.send('trial_end')
 		fill()
 		flip()
 		
@@ -532,6 +535,7 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 		fill()
 		blit(self.origin_inactive, 5, self.origin_pos, flip_x=P.flip_x)
 		flip()
+		self.trigger.send('circle_on')
 
 		start = self.evm.trial_time
 		if P.demo_mode or P.dm_always_show_cursor:
