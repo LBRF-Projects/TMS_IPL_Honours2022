@@ -81,6 +81,7 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 	feedback_type = False
 	first_trial = False
 	handedness = None
+	tms_delay = None
 	created = None
 	show_practice_display = False  # ie. this session should include the practice display
 	lj = None
@@ -104,11 +105,14 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 	# dynamic trial vars
 	drawing = []
 	rt = None  # time to initiate responding post-stimulus
+	tt = None  # time to the tms firing from the initiation of the participant's response
 	mt = None  # time to start and complete response
 	it = None  # time between arriving at origin and intiating response (ie. between RT and MT)
 	control_response = None
 	test_figures = {}
 	figure = None
+	firing_delay = None  # the time the TMS should fire after participant response (in seconds)
+	TMS_FIRED = None  # did the TMS fire during a trial
 	control_question = None  # which question the control will be asked to report an answer for
 
 	# configured trial factors (dynamically loaded per-trial
@@ -240,11 +244,12 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 			self.trigger = get_trigger_port()
 			self.trigger.add_codes(P.trigger_codes)
 
-		# Initialize TMS communication (if required)
+		# Initialize TMS communication and set fixed power level
 		self.magstim = None
 		if P.requires_tms:
 			from communication import get_tms_controller
 			self.magstim = get_tms_controller()
+			self.magstim.set_power(60)
 
 
 	def block(self):
@@ -328,6 +333,11 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 		self.control_response = -1
 		self.figure = None
 
+		# Reset TMS variables for the trial
+		self.TMS_FIRED = False
+		self.tt = 0
+		self.firing_delay = self.animate_time / 1000 * self.tms_delay
+
 		# Either load a pre-generated figure or generate a new one, depending on trial
 		if self.figure_name == "random":
 			self.figure = self._generate_figure(duration=self.animate_time)
@@ -366,6 +376,9 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 
 	def trial(self):
 
+		if self.response_type == "imagery" and not self.magstim.ready:
+			self.magstim.arm()
+		
 		start_delay = CountDown(P.origin_wait_time)
 		while start_delay.counting():
 			ui_request()
@@ -387,6 +400,9 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 
 		fill()
 		flip()
+		
+		# Disarm the magstim at the end of each trial
+		self.magstim.disarm()
 
 		if self.__practicing__:
 			return
@@ -408,7 +424,10 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 			"it": self.it,
 			"control_question": self.control_question if self.response_type == CTRL else 'NA',
 			"control_response": self.control_response,
-			"mt": self.mt
+			"mt": self.mt,
+			"tt": self.tt,
+			"firing_delay": self.firing_delay if self.response_type == MOTR else 'NA',
+			"tms_fired": self.TMS_FIRED,
 		}
 
 
@@ -525,14 +544,24 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 			if self.within_boundary('origin', (x, y)) and left_button_down:
 				at_origin = True
 				self.rt = self.evm.trial_time - start
+				self.trigger.send('imagery_start')
 			ui_request()
 		fill()
 		blit(self.origin_active, 5, self.origin_pos, flip_x=P.flip_x)
 		flip()
 
+		tms_fire_onset = start + self.rt + self.firing_delay
+		allow_fire = not self.__practicing__
 		while at_origin:
 			x, y, button = mouse_pos(return_button_state=True)
 			left_button_down = button == 1
+			if allow_fire and self.evm.trial_time > tms_fire_onset:
+				if self.magstim.ready:
+					self.tt = self.evm.trial_time - (self.rt + start)
+					self.trigger.send('EMG_TMS')
+					self.TMS_FIRED = True
+				allow_fire = False
+
 			if not (self.within_boundary('origin', (x, y)) and left_button_down):
 				at_origin = False
 		self.mt = self.evm.trial_time - (self.rt + start)

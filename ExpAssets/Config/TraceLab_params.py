@@ -21,16 +21,17 @@ auto_generate_count = 10  # number of figures to generate in auto-generate/captu
 #########################################
 # Digital Trigger Configuration
 #########################################
-requires_triggers = False
+requires_triggers = True
 labjack_port = 'FIO' # Either FIO, EIO, or CIO
 trigger_codes = {
-
+    'imagery_start': 2,
+    'EMG_TMS': 17,
 }
 
 #########################################
 # TMS Configuration
 #########################################
-requires_tms = False
+requires_tms = True
 tms_serial_port = '/dev/ttyUSB0'
 
 #########################################
@@ -180,6 +181,7 @@ exclude_data_cols = [
 # it will automatically be used for each participant without prompting.
 session_structures = {
     'a': [
-        ['MI-XX', 'MI-XX', 'MI-XX', 'MI-XX', 'PP-XX'] # session 1
+        ['MI-XX', 'MI-XX', 'MI-XX', 'MI-XX', 'PP-XX'], # session 1
+        ['PP-XX'], # session 2
     ]
 }

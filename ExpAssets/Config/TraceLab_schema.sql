@@ -47,6 +47,7 @@ CREATE TABLE participants (
 	sex                TEXT                              NOT NULL,
 	age                INTEGER                           NOT NULL,
 	handedness         TEXT                              NOT NULL,
+	tms_delay		   TEXT                              NOT NULL,
 	session_structure  TEXT,
 	session_count      INTEGER,
 	sessions_completed INTEGER DEFAULT 0,
@@ -74,7 +75,10 @@ CREATE TABLE trials (
 	it               FLOAT                             NOT NULL,
 	control_question TEXT                              NOT NULL,
 	control_response INTEGER                           NOT NULL,
-	mt               FLOAT                             NOT NULL
+	mt               FLOAT                             NOT NULL,
+	tt				 FLOAT                             NOT NULL,
+	firing_delay	 TEXT                              NOT NULL,
+	tms_fired		 BOOLEAN                           NOT NULL
 );
 
 CREATE TABLE sessions (

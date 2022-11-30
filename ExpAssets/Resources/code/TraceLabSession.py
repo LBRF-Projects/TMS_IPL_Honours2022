@@ -72,7 +72,7 @@ class TraceLabSession(EnvAgent):
 		log = io.open(log_path, "w+", encoding='utf-8')
 		p_cols = [
 			'user_id', 'session_structure', 'session_count', 'sessions_completed',
-			'figure_set', 'handedness', 'created'
+			'figure_set', 'handedness', 'tms_delay', 'created'
 		]
 		header = p_cols + ["session_rows", "trial_rows"]
 		log.write("\t".join(header))
@@ -294,7 +294,7 @@ class TraceLabSession(EnvAgent):
 		try:
 			cols = [
 				'id', 'session_structure', 'session_count', 'sessions_completed',
-				'figure_set', 'handedness', 'created'
+				'figure_set', 'handedness', 'tms_delay', 'created'
 			]
 			user_data = self.db_select('participants', cols, where={'user_id': self.user_id})[0]
 			self.restore_session(user_data)
@@ -396,7 +396,8 @@ class TraceLabSession(EnvAgent):
 		self.exp.session_number = user_data[3]
 		self.exp.figure_set_name = user_data[4]
 		self.exp.handedness = user_data[5]
-		self.exp.created = user_data[6]
+		self.exp.tms_delay = float(user_data[6][:2]) / 100 # convert from % string to proportion
+		self.exp.created = user_data[7]
 
 		self.exp.session_number += 1  # check if last session incomplete and prompt if so?
 		P.session_number = self.exp.session_number

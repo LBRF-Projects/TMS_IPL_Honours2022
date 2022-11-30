@@ -104,6 +104,26 @@
 			},
 			"anonymous_value": 1,
 			"active": true
+		},
+		{
+			"index": 5,
+			"title": "tms_delay",
+			"database_field": "tms_delay",
+			"query": "How far into each imagined tracing should the TMS fire? (25% or 50%)",
+			"accepted": ["25%", "50%"],
+			"allow_null": false,
+			"format": {
+				"type": "str",
+                "styles": "default",
+                "positions": "default",
+				"password": false,
+				"range": null,
+				"case_sensitive": null,
+				"accept_as_true": null,
+				"action": null
+			},
+			"anonymous_value": null,
+			"active": true
 		}
 	],
 	"experimental": [
