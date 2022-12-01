@@ -258,6 +258,10 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 		self.response_type = self.block_factors[P.block_number - 1]['response_type']
 		self.feedback_type = self.block_factors[P.block_number - 1]['feedback_type']
 
+		# If starting a physical practice block, disarm the magstim
+		if self.response_type == PHYS and self.magstim.ready:
+			self.magstim.disarm()
+
 		# If on first block of session, or response type is different from response type of
 		# previous block, do tutorial animation and practice
 		if self.response_type != self.prev_response_type:
@@ -403,9 +407,6 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 		self.trigger.send('trial_end')
 		fill()
 		flip()
-		
-		# Disarm the magstim at the end of each trial
-		self.magstim.disarm()
 
 		if self.__practicing__:
 			return
