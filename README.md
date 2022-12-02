@@ -45,7 +45,7 @@ These commands should create a fresh environment for the TraceLab project with a
 Alternatively, to install the dependencies for the task in your global Python environment, run the following commands in a terminal window:
 
 ```bash
-pip install git+https://github.com/a-hurst/klibs.git
+pip install https://github.com/a-hurst/klibs/releases/latest/download/klibs.tar.gz
 pip install pyyaml
 pip install MagPy-TMS==1.4
 pip install LabJackPython
