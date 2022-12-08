@@ -371,7 +371,7 @@ class MagPyController(TMSController):
         err, msg = self._device.highResolutionMode(False, receipt=True)
         if err != 3:
             self._device.setPowerB(0)
-            self._device.setPulseInterval(0)
+            self._device.setPulseInterval(1)
 
     def _set_power(self, level):
         err, msg = self._device.setPower(level, receipt=True)
