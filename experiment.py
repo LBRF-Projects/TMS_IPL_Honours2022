@@ -574,6 +574,9 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 					self.tt = self.evm.trial_time - (self.rt + start)
 					self.trigger.send('EMG_TMS')
 					self.TMS_FIRED = True
+				if not self.TMS_FIRED:
+					e = " * NOTE: TMS failed to fire on block {0}, trial {1}"
+					print(e.format(P.block_number, P.trial_number))
 				allow_fire = False
 
 			if not (self.within_boundary('origin', (x, y)) and left_button_down):
