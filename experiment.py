@@ -258,10 +258,6 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 		self.response_type = self.block_factors[P.block_number - 1]['response_type']
 		self.feedback_type = self.block_factors[P.block_number - 1]['feedback_type']
 
-		# If starting a physical practice block, disarm the magstim
-		if self.response_type == PHYS and self.magstim.ready:
-			self.magstim.disarm()
-
 		# If on first block of session, or response type is different from response type of
 		# previous block, do tutorial animation and practice
 		if self.response_type != self.prev_response_type:
@@ -374,20 +370,16 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 		self.log("t{0}_intertrial_interval_start".format(P.trial_number), True)
 		self.intertrial_start = time.time()
 
-		# Arm magstim right before trial if not already armed
-		if self.response_type == "imagery" and not self.magstim.ready:
-			try:
-				self.magstim.arm()
-			except RuntimeError:
-				# If Magstim already armed, re-arming will result in an error.
-				# Since we can't check directly if the Magstim is armed (only
-				# whether it's ready to fire, which is False ~3-4 seconds after
-				# firing despite the Magstim being armed), we just have to
-				# try/catch here.
-				pass
+		# Disarm magstim on imagery trials if it's already armed (resets timeout)
+		if self.response_type == "imagery" and self.magstim.ready:
+			self.magstim.disarm()
 
 		# Let participant self-initiate next trial
 		self.start_trial_button()
+
+		# Arm magstim immediately before trial starts (usually takes ~3 seconds)
+		if self.response_type == "imagery":
+			self.magstim.arm()
 
 
 	def trial(self):
