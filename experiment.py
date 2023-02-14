@@ -193,6 +193,10 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 		self.session = TraceLabSession()
 		self.user_id = self.session.user_id
 
+		# Add flags for first block/trial of run, needed for resuming mid-session
+		self.first_block = True
+		self.first_trial = True
+
 		# Once session initialized, show loading screen and finish setup
 		self.loading_msg = message("Loading...", "default", blit_txt=False)
 		fill()
@@ -254,6 +258,12 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 
 	def block(self):
 
+		# If reloading incomplete session, update block number accordingly
+		if self.first_block:
+			blocks_in_session = len(self.blocks.blocks)
+			P.block_number = (P.blocks_per_experiment - blocks_in_session) + 1
+			self.first_block = False
+
 		# Get response type and feedback type for block
 		self.response_type = self.block_factors[P.block_number - 1]['response_type']
 		self.feedback_type = self.block_factors[P.block_number - 1]['feedback_type']
@@ -291,9 +301,6 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 			flip()
 		any_key()
 
-		# Indicates if on first trial of block, needed for reloading incomplete sessions
-		self.first_trial = True
-
 
 	def setup_response_collector(self):
 
@@ -318,11 +325,9 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 
 	def trial_prep(self):
 
-		# If reloading incomplete block, update trial/block numbers accordingly
+		# If reloading incomplete block, update trial number accordingly
 		if self.first_trial:
-			blocks_in_session = len(self.blocks.blocks)
 			trials_in_block = len(self.blocks.blocks[0])
-			P.block_number = (P.blocks_per_experiment - blocks_in_session) + 1
 			P.trial_number = (P.trials_per_block - trials_in_block) + 1
 			self.first_trial = False
 
