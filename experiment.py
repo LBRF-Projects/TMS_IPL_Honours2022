@@ -318,9 +318,11 @@ class TraceLab(klibs.Experiment, BoundaryInspector):
 
 	def trial_prep(self):
 
-		# If reloading incomplete block, update trial number accordingly
+		# If reloading incomplete block, update trial/block numbers accordingly
 		if self.first_trial:
-			trials_in_block = len(self.blocks.blocks[P.block_number - 1])
+			blocks_in_session = len(self.blocks.blocks)
+			trials_in_block = len(self.blocks.blocks[0])
+			P.block_number = (P.blocks_per_experiment - blocks_in_session) + 1
 			P.trial_number = (P.trials_per_block - trials_in_block) + 1
 			self.first_trial = False
 
