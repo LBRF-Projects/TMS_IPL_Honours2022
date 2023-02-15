@@ -436,8 +436,8 @@ class MagnetoController(TMSController):
     def _hardware_init(self):
         self._device.connect()
         try:
-            self._set_pulse_interval(1)
-            self._set_power_b(0)
+            self._device._set_pulse_interval(1)
+            self._device._set_power_b(0)
         except RuntimeError:
             pass
 
