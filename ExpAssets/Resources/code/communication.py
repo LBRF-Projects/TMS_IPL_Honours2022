@@ -435,8 +435,13 @@ class MagnetoController(TMSController):
     """
     def _hardware_init(self):
         self._device.connect()
+        # For this study, we disable simultaneous discharge mode since Jack's
+        # original study didn't use it
         try:
-            self._device._set_pulse_interval(1)
+            # Configure into separate-discharge single-pulse mode
+            # NOTE: Interval is 10 and not 1 because if BiStim is in high-res
+            #       time mode, pulse interval can't be set below 1.0ms.
+            self._device._set_pulse_interval(10)
             self._device._set_power_b(0)
         except RuntimeError:
             pass
